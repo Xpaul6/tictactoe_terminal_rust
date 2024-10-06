@@ -82,28 +82,22 @@ fn is_occupied(position: usize, board: &Vec<&str>) -> bool {
 }
 
 fn is_full(board: &Vec<&str>) -> bool {
-    let filtered_board: Vec<_> = board.clone().into_iter().filter(|x| *x == "X" || *x == "O").collect();
-    return matches!(filtered_board.len(), 9);
+    return matches!(board.iter().filter(|x| **x == "X" || **x == "O").collect::<Vec<_>>().len(), 9);
 }
 
 fn check_win_conditions(board: &Vec<&str>, win_conditions: &[[usize; 3]; 8]) {
     for i in win_conditions {
         if board[i[0]] == board[i[1]] && board[i[1]] == board[i[2]] {
-            if board[i[0]] == "X" {
-                render(board);
-                println!("You win!");
-                call_menu();
-            } else if board[i[0]] == "O"{
-                println!("You lose :(");
-                call_menu();
-            }
+            render(board);
+            println!("{}", if board[i[0]] == "X" { "You win!" } else { "You lose :(" });
+            call_menu();
         }
     }
     if is_full(board) {
         render(board);
         println!("A draw!");
         call_menu();
-     }
+    }
 }
 
 fn call_menu() {
