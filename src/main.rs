@@ -36,20 +36,14 @@ fn main() {
         };
         
         // check if player makes a correct move
-        match player_move < 1 && player_move > 9 {        
-            true => {
-                println!("Out of bounds, enter a correct cell number");
-                continue;
-            },
-            false => {},
+        if player_move < 1 && player_move > 9 {
+            println!("Out of bounds, enter a correct cell number");
+            continue;
         }
-        match is_occupied(player_move, &board) {
-            true => {
-                println!("This cell is already occupied, choose an empty one");
-                continue;
-            },
-            false => {},
-        };
+        if is_occupied(player_move, &board) {
+            println!("This cell is already occupied, choose an empty one");
+            continue;
+        }
 
         // player move
         board[player_move - 1] = "X";
@@ -85,43 +79,21 @@ fn render(board: &Vec<&str>) {
     io::stdout().execute(terminal::Clear(terminal::ClearType::All)).unwrap();
     io::stdout().execute(cursor::MoveTo(0, 1)).unwrap();
     println!(" {} | {} | {} \n---+---+---\n {} | {} | {} \n---+---+---\n {} | {} | {} ",
-    colorize(board[0]),
-    colorize(board[1]),
-    colorize(board[2]),
-    colorize(board[3]),
-    colorize(board[4]),
-    colorize(board[5]),
-    colorize(board[6]),
-    colorize(board[7]),
-    colorize(board[8]));
+    colorize(board[0]), colorize(board[1]), colorize(board[2]),
+    colorize(board[3]), colorize(board[4]), colorize(board[5]),
+    colorize(board[6]), colorize(board[7]), colorize(board[8]));
 }
 
 fn is_occupied(position: usize, board: &Vec<&str>) -> bool {
-    if board[position - 1] == "X" || board[position - 1] == "O" {
-        return true;
-    }
-    return false;
+    return matches!(board[position - 1], "X" | "O");
 }
 
 fn is_full(board: &Vec<&str>) -> bool {
-    let mut k: i32 = 0;
-    for i in board {
-        if *i == "X" || *i == "O" {
-            k += 1;
-        }
-    }
-    if k == 9 {
-        return true;
-    }
-    return false;
+    let filtered_board: Vec<_> = board.clone().into_iter().filter(|x| *x == "X" || *x == "O").collect();
+    return matches!(filtered_board.len(), 9);
 }
 
 fn check_win_conditions(board: &Vec<&str>, win_conditions: &[[usize; 3]; 8]) {
-    if is_full(board) {
-       render(board);
-       println!("A draw!");
-       call_menu();
-    }
     for i in win_conditions {
         if board[i[0]] == board[i[1]] && board[i[1]] == board[i[2]] {
             if board[i[0]] == "X" {
@@ -134,6 +106,11 @@ fn check_win_conditions(board: &Vec<&str>, win_conditions: &[[usize; 3]; 8]) {
             }
         }
     }
+    if is_full(board) {
+        render(board);
+        println!("A draw!");
+        call_menu();
+     }
 }
 
 fn call_menu() {
