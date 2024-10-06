@@ -6,7 +6,7 @@ use crossterm::{ExecutableCommand, terminal, cursor};
 
 fn main() {
     let mut board: Vec<&str> = vec!["1", "2", "3", "4", "5", "6", "7", "8", "9"];
-    let win_conditions: [[i32; 3]; 8] = [
+    let win_conditions: [[usize; 3]; 8] = [
         [0, 1, 2],
         [3, 4, 5],
         [6, 7, 8],
@@ -19,8 +19,8 @@ fn main() {
 
     render(&board);
 
-    let mut player_move: i32;
-    let mut bot_move: i32;
+    let mut player_move: usize;
+    let mut bot_move: usize;
     
     // main game loop
     loop {
@@ -52,9 +52,9 @@ fn main() {
         };
 
         // player move
-        board[player_move as usize - 1] = "X";
+        board[player_move - 1] = "X";
 
-        check_win_conditions(&board, win_conditions);
+        check_win_conditions(&board, &win_conditions);
 
         // bot move
         loop {
@@ -62,14 +62,14 @@ fn main() {
             match is_occupied(bot_move, &board) {
                 true => { continue },
                 false => {
-                    board[bot_move as usize - 1] = "O";
+                    board[bot_move - 1] = "O";
                     render(&board);
                     break;
                 },
             };
         }
 
-        check_win_conditions(&board, win_conditions);
+        check_win_conditions(&board, &win_conditions);
     }
 }
 
@@ -96,8 +96,8 @@ fn render(board: &Vec<&str>) {
     colorize(board[8]));
 }
 
-fn is_occupied(position: i32, board: &Vec<&str>) -> bool {
-    if board[position as usize - 1] == "X" || board[position as usize - 1] == "O" {
+fn is_occupied(position: usize, board: &Vec<&str>) -> bool {
+    if board[position - 1] == "X" || board[position - 1] == "O" {
         return true;
     }
     return false;
@@ -110,25 +110,25 @@ fn is_full(board: &Vec<&str>) -> bool {
             k += 1;
         }
     }
-    if k >= 9 {
+    if k == 9 {
         return true;
     }
     return false;
 }
 
-fn check_win_conditions(board: &Vec<&str>, win_conditions: [[i32; 3]; 8]) {
-    if is_full(&board) {
-       render(&board);
+fn check_win_conditions(board: &Vec<&str>, win_conditions: &[[usize; 3]; 8]) {
+    if is_full(board) {
+       render(board);
        println!("A draw!");
        call_menu();
     }
-    for i in &win_conditions {
-        if board[i[0] as usize] == board[i[1] as usize] && board[i[1] as usize] == board[i[2] as usize] {
-            if board[i[0] as usize] == "X" {
-                render(&board);
+    for i in win_conditions {
+        if board[i[0]] == board[i[1]] && board[i[1]] == board[i[2]] {
+            if board[i[0]] == "X" {
+                render(board);
                 println!("You win!");
                 call_menu();
-            } else if board[i[0] as usize] == "O"{
+            } else if board[i[0]] == "O"{
                 println!("You lose :(");
                 call_menu();
             }
@@ -138,9 +138,9 @@ fn check_win_conditions(board: &Vec<&str>, win_conditions: [[i32; 3]; 8]) {
 
 fn call_menu() {
     println!("Hit ENTER to play again or (q) to exit:");
-    let mut tmp = String::new();
-    io::stdin().read_line(&mut tmp).expect("cannot read a line");
-    if tmp.trim() == "q" {
+    let mut menu_input = String::new();
+    io::stdin().read_line(&mut menu_input).expect("cannot read a line");
+    if menu_input.trim() == "q" {
         process::exit(0);
     }
     main();
