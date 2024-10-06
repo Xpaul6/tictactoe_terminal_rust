@@ -51,17 +51,10 @@ fn main() {
         check_win_conditions(&board, &win_conditions);
 
         // bot move
-        loop {
-            bot_move = rand::thread_rng().gen_range(1..=9);
-            match is_occupied(bot_move, &board) {
-                true => { continue },
-                false => {
-                    board[bot_move - 1] = "O";
-                    render(&board);
-                    break;
-                },
-            };
-        }
+        let filtered_board: Vec<_> = board.clone().into_iter().filter(|x| *x != "X" && *x != "O").collect();
+        bot_move = filtered_board[rand::thread_rng().gen_range(0..filtered_board.len())].parse().expect("bot move filter failed");
+        board[bot_move - 1] = "O";
+        render(&board);
 
         check_win_conditions(&board, &win_conditions);
     }
