@@ -36,7 +36,7 @@ fn main() {
         };
         
         // check if player makes a correct move
-        if player_move < 1 && player_move > 9 {
+        if player_move < 1 || player_move > 9 {
             println!("Out of bounds, enter a correct cell number");
             continue;
         }
